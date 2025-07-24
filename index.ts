@@ -8,12 +8,10 @@ const app = express();
 const port = 3000;
 
 app.use(express.json()); // Add this line to parse JSON request bodies
-app.use(
-  cors({
-    origin: "https://min-ly-fe.vercel.app",
-    methods: ["GET", "POST"],
-  })
-);
+app.options("*", cors({
+  origin: "https://min-ly-fe.vercel.app",
+  methods: ["GET", "POST"],
+}));
 
 app.post("/create", async (req: Request, res: Response) => {
   try {
