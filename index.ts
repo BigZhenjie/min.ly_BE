@@ -1,4 +1,4 @@
-import express from "express";
+import express, { Request, Response } from "express";
 import { checkRedisCache, checkShortUrlExists, createShortUrl, getURLFromDB, increClicks, putInRedis } from "./utils/db";
 import { generateRandomBase62 } from "./utils/base62";
 import cors from "cors";
@@ -15,7 +15,7 @@ app.use(
   })
 );
 
-app.post("/create", async (req, res) => {
+app.post("/create", async (req: Request, res: Response) => {
   try {
     const { shortUrl, url } = req.body;
     //verify if long url is indeed a url
@@ -60,7 +60,7 @@ app.post("/create", async (req, res) => {
   }
 });
 
-app.get("/:shortUrl", async (req, res) => {
+app.get("/:shortUrl", async (req: Request, res: Response) => {
   try {
     const shortUrl = req.params.shortUrl;
 
@@ -68,7 +68,16 @@ app.get("/:shortUrl", async (req, res) => {
     const existsInRedis = await checkRedisCache(shortUrl);
     if (existsInRedis.data){
       await increClicks(shortUrl);
-      return res.redirect(existsInRedis.data)
+      // If data is an object, use the correct property (e.g., long_url). If it's a string, use as is.
+      const urlToRedirect = typeof existsInRedis.data === 'string'
+        ? existsInRedis.data
+        : (existsInRedis.data && typeof (existsInRedis.data as any).long_url === 'string'
+            ? (existsInRedis.data as { long_url: string }).long_url
+            : undefined);
+      if (!urlToRedirect) {
+        return res.status(400).send({ error: "Invalid data in cache." });
+      }
+      return res.redirect(urlToRedirect)
     }
     //check db
     const existsInDB = await getURLFromDB(shortUrl);
