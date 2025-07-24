@@ -58,7 +58,7 @@ app.post("/create", async (req: Request, res: Response) => {
   }
 });
 
-app.get("/:shortUrl", async (req: Request, res: Response) => {
+app.get("/", async (req: Request, res: Response) => {
   try {
     const shortUrl = req.params.shortUrl;
 
