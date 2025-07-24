@@ -10,7 +10,7 @@ const port = 3000;
 app.use(express.json()); // Add this line to parse JSON request bodies
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: "https://min-ly-fe.vercel.app",
     methods: ["GET", "POST"],
   })
 );
